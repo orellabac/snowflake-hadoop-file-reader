@@ -16,17 +16,72 @@ import org.apache.hadoop.util.ReflectionUtils;
 import com.snowflake.snowpark_java.types.SnowflakeFile;
 import java.io.FileOutputStream;
 
+
+
 class DataRow {
-    public String customer_no;
-    public String account_no;
-    public DataRow(String key, String content) {
-        var parts = key.split(" ");
-        customer_no = parts[0];
-        account_no = parts[1];
+    public String receiverId;
+    public String parentReceiverId;
+    public String receiverModel;
+    public String equipmentModel;
+    public String accountId;
+    public String dma;
+    public String postalCode;
+    public String provisionedLocal;
+    public String receivers;
+    public String serviceCodes;
+    public String unresolvedToken;
+    public String accountType;
+    public String unresolvedTokenPayloadConfirmationCode;
+    public String receiverInstallDate;
+    public String[] payloadArray;	
+    public String inputPath;
+
+
+    public DataRow(String key,String content) {
+        String[] receiverPayloads = content.split("\001");
+         receiverId = receiverPayloads[0];
+         parentReceiverId = receiverPayloads[1];
+         receiverModel = receiverPayloads[2];
+         equipmentModel = receiverPayloads[3];
+         accountId = replaceNull(receiverPayloads[4]);
+         dma = replaceNull(receiverPayloads[5]);
+         postalCode = replaceNull(receiverPayloads[6]);
+         provisionedLocal = receiverPayloads[7];
+         receivers = receiverPayloads[8];
+         serviceCodes = receiverPayloads[9];
+         unresolvedToken = replaceNull(receiverPayloads[10]);
+         accountType = replaceNull(receiverPayloads[11]);
+         unresolvedTokenPayloadConfirmationCode = replaceNull(receiverPayloads[12]);
+         receiverInstallDate = replaceNull(receiverPayloads[14]);
+         payloadArray = receiverPayloads[13].split("\002");	
+         inputPath = receiverPayloads[14];
     }
+
+    public static String replaceNull(String inStr) {
+		if (inStr != null && inStr.equalsIgnoreCase("null"))
+			return "";
+		else
+			return inStr;
+	}
+
     public String toString() {
-        return String.format("%s,%s", customer_no, account_no);
+        var sb = new StringBuilder();
+        try {
+            for(var f :this.getClass().getFields())
+            {
+                sb.append(f.getName());
+                sb.append(":");
+            
+                    sb.append(f.get(this));
+
+                sb.append(",");
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
+
 }
 
 public class SequenceFileReader {
