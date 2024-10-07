@@ -63,8 +63,7 @@ public class GenericSequenceFileReader {
     private Path copyLocally(String path) 
     {
         try (
-            InputStream inputStream = Files.newInputStream(java.nio.file.Path.of(path));
-            //SnowflakeFile.newInstance(path, false).getInputStream();
+            InputStream inputStream = SnowflakeFile.newInstance(path, false).getInputStream();
             BufferedOutputStream bufferedOutputStream = 
                 new BufferedOutputStream(new FileOutputStream("/tmp/inputfile.dat"))) 
             {
